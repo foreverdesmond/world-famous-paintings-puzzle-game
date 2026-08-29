@@ -10,6 +10,7 @@ export interface Artwork {
   id: string
   width: number
   height: number
+  imagePath?: string
 }
 
 export type ArtworkOrientation = 'landscape' | 'portrait' | 'square'
