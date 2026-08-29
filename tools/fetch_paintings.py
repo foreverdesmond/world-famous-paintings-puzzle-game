@@ -247,11 +247,11 @@ def commons_resolve(title, artist):
 
 # ---------------- extras to reach 100 ----------------
 EXTRAS = [
-    ("The Dance Class", "Edgar Degas"), ("Little Dancer of Fourteen Years", "Edgar Degas"),
+    ("The Dance Class", "Edgar Degas"), ("The Third of May 1808", "Francisco Goya"),
     ("The Large Bathers", "Paul Cezanne"), ("The Card Players", "Paul Cezanne"),
     ("The Bodmer Oak, Fontainebleau Forest", "Gustave Courbet"),
     ("La Grande Odalisque", "Jean-Auguste-Dominique Ingres"),
-    ("The Turkish Bath", "Jean-Auguste-Dominique Ingres"),
+    ("Venus of Urbino", "Titian"),
     ("Christ in the Storm on the Sea of Galilee", "Rembrandt"),
     ("Girl Reading a Letter at an Open Window", "Johannes Vermeer"),
     ("View of Delft", "Johannes Vermeer"), ("The Swing", "Jean-Honore Fragonard"),
