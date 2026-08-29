@@ -47,23 +47,40 @@ type ManifestRow = {
   file: string
 }
 
+// Vite rewrites each local import to a production asset URL and emits the JPEG.
+// Keeping this boundary here prevents the UI from ever using manifest image_url.
+const localImageModules = import.meta.glob('/assets/paintings/*.jpg', {
+  eager: true,
+  import: 'default',
+  query: '?url',
+}) as Record<string, string>
+
+export const artworkImageUrls: Readonly<Record<string, string>> = Object.fromEntries(
+  Object.entries(localImageModules).map(([path, url]) => [deriveArtworkId(path), url]),
+)
+
 export const artworkCatalog: readonly Artwork[] = loadArtworkCatalog(
   manifestCsv,
   ARTWORK_DIMENSIONS,
   ARTWORK_TRANSLATIONS,
+  artworkImageUrls,
 )
 
 export function loadArtworkCatalog(
   csv: string,
   dimensions: Readonly<Record<string, ArtworkDimensions>>,
   translations: Readonly<Record<string, ArtworkTranslation>>,
+  imageUrls: Readonly<Record<string, string>> = artworkImageUrls,
 ): readonly Artwork[] {
   const rows = parseCsv(csv)
   const ids = new Set<string>()
-  const catalog = rows.map((row) => {
+  for (const row of rows) {
     const id = deriveArtworkId(row.file)
     if (ids.has(id)) throw new Error(`Duplicate artwork id: ${id}`)
     ids.add(id)
+  }
+  const catalog = rows.map((row) => {
+    const id = deriveArtworkId(row.file)
 
     const translation = translations[id]
     if (!translation?.titleZh.trim() || !translation.artistZh.trim()) {
@@ -73,8 +90,10 @@ export function loadArtworkCatalog(
     if (!size || !Number.isInteger(size.width) || !Number.isInteger(size.height) || size.width <= 0 || size.height <= 0) {
       throw new Error(`Missing or invalid image dimensions: ${id}`)
     }
-    const imagePath = `/assets/paintings/${row.file.split('/').pop()}`
-    if (!imagePath || !imagePath.endsWith('.jpg')) throw new Error(`Invalid local image path: ${id}`)
+    const imagePath = imageUrls[id]
+    if (!imagePath || !imagePath.endsWith('.jpg') || /^(https?:)?\/\//.test(imagePath)) {
+      throw new Error(`Invalid local image path: ${id}`)
+    }
 
     return {
       id,

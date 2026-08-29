@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   UNKNOWN_DATE,
   artworkCatalog,
+  artworkImageUrls,
   deriveArtworkId,
   loadArtworkCatalog,
   loadMaintenanceRecords,
@@ -13,15 +14,15 @@ describe('artworkCatalog', () => {
   it('loads the real manifest into 101 unique artwork records', () => {
     expect(artworkCatalog).toHaveLength(101)
     expect(new Set(artworkCatalog.map((artwork) => artwork.id)).size).toBe(101)
-    expect(artworkCatalog.every((artwork) => artwork.imagePath.startsWith('/assets/paintings/'))).toBe(true)
+    expect(artworkCatalog.every((artwork) => artwork.imagePath.endsWith('.jpg'))).toBe(true)
   })
 
   it('contains both fixed practice images as local resources', () => {
     expect(artworkCatalog.find(({ id }) => id === 'mona-lisa__leonardo-da-vinci')?.imagePath).toBe(
-      '/assets/paintings/mona-lisa__leonardo-da-vinci.jpg',
+      artworkImageUrls['mona-lisa__leonardo-da-vinci'],
     )
     expect(artworkCatalog.find(({ id }) => id === 'the-starry-night__vincent-van-gogh')?.imagePath).toBe(
-      '/assets/paintings/the-starry-night__vincent-van-gogh.jpg',
+      artworkImageUrls['the-starry-night__vincent-van-gogh'],
     )
   })
 
@@ -62,5 +63,12 @@ describe('artworkCatalog', () => {
     expect(Object.keys(ARTWORK_TRANSLATIONS)).toHaveLength(101)
     expect(Object.keys(ARTWORK_DIMENSIONS)).toHaveLength(101)
     expect(artworkCatalog.map(({ id }) => id)).toEqual(Object.keys(ARTWORK_TRANSLATIONS))
+  })
+
+  it('has a generated local URL for every manifest image, not a remote URL', () => {
+    expect(Object.keys(artworkImageUrls)).toHaveLength(101)
+    expect(new Set(Object.values(artworkImageUrls)).size).toBe(101)
+    expect(artworkCatalog.every(({ id, imagePath }) => imagePath === artworkImageUrls[id])).toBe(true)
+    expect(Object.values(artworkImageUrls).every((url) => url.endsWith('.jpg') && !/^https?:\/\//.test(url))).toBe(true)
   })
 })
