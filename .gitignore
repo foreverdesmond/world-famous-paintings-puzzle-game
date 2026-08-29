@@ -95,7 +95,7 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
-# Node/npm files, if a web client is added later
+# Node/npm files
 node_modules/
 npm-debug.log*
 yarn-debug.log*

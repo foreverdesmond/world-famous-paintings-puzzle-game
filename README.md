@@ -9,8 +9,8 @@
 ## 当前进度
 
 - ✅ 素材库：`assets/paintings/` 收录 101 幅世界名画的中分辨率缩略图 + 完整来源清单（`manifest.csv`）
-- ⏳ 玩法：滑片 / 旋转 / 限时 / 步数待定
-- ⏳ 技术栈：Web 单页 / 移动端待定
+- ⏳ 玩法：拼图规则与游戏页面开发中
+- ✅ 技术栈：Vite + React + TypeScript + Vitest + React Testing Library
 - ⏳ MVP 可玩版本待开发
 
 ## 素材库
@@ -20,9 +20,16 @@
 - 100 幅来自 Wikimedia Commons（95 Public domain / 5 CC0）
 - 1 幅来自 The Metropolitan Museum of Art（CC0）
 
-## 技术栈
+## 本地开发
 
-待定（轻量原则：单页可玩、无账号系统起步、可选本地进度保存）。
+```bash
+npm install
+npm run dev
+```
+
+常用验证命令：`npm run typecheck`、`npm run build`、`npm test`。
+
+项目是无后端的单页前端；游戏状态仅存在于当前会话，不接入账号、分析或在线图片服务。
 
 ## 许可证
 
