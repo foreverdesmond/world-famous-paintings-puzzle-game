@@ -30,5 +30,6 @@ describe('PuzzleBoard', () => {
     render(<PuzzleBoard board={largeBoard} artwork={artwork} selectedTileIndex={null} onTileClick={() => undefined} />)
     expect(screen.getByTestId('puzzle-board')).toHaveStyle('aspect-ratio: 1200 / 800')
     expect(screen.getAllByRole('button')).toHaveLength(rows * columns)
+    expect(screen.getByTestId('puzzle-board')).toHaveAttribute('data-grid-gap', '0')
   })
 })
