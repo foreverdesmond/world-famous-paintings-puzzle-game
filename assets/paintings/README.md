@@ -12,8 +12,8 @@
 
 | 来源 | 数量 | 许可证 |
 |---|---|---|
-| Wikimedia Commons | 100 | 95 张 Public domain、5 张 CC0 |
-| The Metropolitan Museum of Art | 1 | CC0（Met Open Access）|
+| Wikimedia Commons | 100 | 98 张 Public domain、2 张 CC0 |
+| The Metropolitan Museum of Art | 1 | CC0（Met Open Access） |
 
 （其他可用官源：Art Institute of Chicago、Cleveland Museum of Art，均 CC0，供后续补充。）
 
