@@ -78,6 +78,55 @@ describe('useGameSession', () => {
     expect(result.current.elapsedMs).toBe(1234)
   })
 
+  it('allows startGame only from idle and rejects it in playing, fault, and completed', async () => {
+    const clock = new FakeClock()
+    const loadImage = vi.fn(async () => undefined)
+    const { result } = renderHook(() => useGameSession({ artworks, clock, random: () => 0, loadImage }))
+
+    act(() => result.current.startGame()); await act(flushPromises); act(() => clock.advanceBy(5000))
+    expect(result.current.status).toBe('playing')
+    const playingSession = result.current.session
+    act(() => result.current.startGame())
+    expect(result.current.status).toBe('playing')
+    expect(result.current.session).toBe(playingSession)
+    expect(loadImage).toHaveBeenCalledTimes(1)
+
+    act(() => result.current.exitGame())
+    expect(result.current.status).toBe('idle')
+    act(() => result.current.startGame())
+    await act(flushPromises)
+    expect(result.current.status).toBe('preview')
+    act(() => result.current.startGame())
+    expect(result.current.status).toBe('preview')
+    act(() => result.current.exitGame())
+
+    const faultLoadImage = vi.fn(async () => { throw new Error('offline') })
+    const fault = renderHook(() => useGameSession({ artworks, clock, retryDelayMs: () => 1, loadImage: faultLoadImage }))
+    act(() => fault.result.current.startGame())
+    for (let attempt = 1; attempt < 5; attempt += 1) {
+      await act(flushPromises); act(() => clock.advanceBy(1))
+    }
+    await act(flushPromises)
+    expect(fault.result.current.status).toBe('fault')
+    const faultSession = fault.result.current.session
+    act(() => fault.result.current.startGame())
+    expect(fault.result.current.status).toBe('fault')
+    expect(fault.result.current.session).toBe(faultSession)
+    expect(faultLoadImage).toHaveBeenCalledTimes(5)
+    act(() => fault.result.current.exitGame())
+
+    const completed = renderHook(() => useGameSession({ artworks, clock, random: () => 0, loadImage: async () => undefined }))
+    act(() => completed.result.current.startGame()); await act(flushPromises); act(() => clock.advanceBy(5000))
+    solvePractice(completed.result)
+    expect(completed.result.current.status).toBe('completed')
+    const completedSession = completed.result.current.session
+    act(() => completed.result.current.startGame())
+    expect(completed.result.current.status).toBe('completed')
+    expect(completed.result.current.session).toBe(completedSession)
+    completed.unmount()
+    fault.unmount()
+  })
+
   it('switches stage after completion and preserves used artwork ids', async () => {
     const clock = new FakeClock()
     const { result } = renderHook(() => useGameSession({ artworks, clock, random: () => 0, loadImage: async () => undefined }))
@@ -132,13 +181,21 @@ describe('useGameSession', () => {
     act(() => clock.advanceBy(5000)); solvePractice(result)
     expect(result.current.session?.stage).toBe(100)
     expect(result.current.status).toBe('final-completed')
+    const finalSession = result.current.session
+    act(() => result.current.startGame())
+    expect(result.current.status).toBe('final-completed')
+    expect(result.current.session).toBe(finalSession)
   })
 
   it('does not write game state to browser persistence APIs', async () => {
     const clock = new FakeClock()
     const setItem = vi.spyOn(Storage.prototype, 'setItem')
+    const cookieSetter = vi.spyOn(Document.prototype, 'cookie', 'set')
+    const indexedDbOpen = typeof window.indexedDB === 'undefined' ? undefined : vi.spyOn(window.indexedDB, 'open')
     const { result } = renderHook(() => useGameSession({ artworks, clock, loadImage: async () => undefined }))
     act(() => result.current.startGame()); await act(flushPromises)
     expect(setItem).not.toHaveBeenCalled()
+    expect(cookieSetter).not.toHaveBeenCalled()
+    if (indexedDbOpen) expect(indexedDbOpen).not.toHaveBeenCalled()
   })
 })

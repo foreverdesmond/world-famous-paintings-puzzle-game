@@ -137,10 +137,11 @@ export function useGameSession(options: UseGameSessionOptions): GameSessionContr
   }, [clock, loadImage, maxLoadAttempts, options.artworks, previewDurationMs, random, retryDelayMs])
 
   const startGame = useCallback(() => {
+    if (state.status !== 'idle') return
     invalidate()
     const token = generation.current
     beginStage(1, new Set(), token)
-  }, [beginStage, invalidate])
+  }, [beginStage, invalidate, state.status])
 
   const clickTile = useCallback((index: number) => {
     setState((current) => {
