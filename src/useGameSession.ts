@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { Artwork as CatalogArtwork } from './artworkCatalog'
 import {
-  type Artwork,
+  type Artwork as RuleArtwork,
   type Board,
   createShuffledBoard,
   getArtworkOrientation,
@@ -14,7 +15,7 @@ export type SessionStatus = 'idle' | 'loading' | 'preview' | 'playing' | 'comple
 export interface GameSession {
   stage: number
   usedArtworkIds: ReadonlySet<string>
-  artwork: Artwork
+  artwork: CatalogArtwork
   board: Board
   selectedTileIndex: number | null
   startedAtMs: number | null
@@ -32,7 +33,7 @@ export interface SessionClock {
 export type ImageLoader = (imagePath: string) => Promise<void>
 
 export interface UseGameSessionOptions {
-  artworks: readonly Artwork[]
+  artworks: readonly RuleArtwork[]
   random?: () => number
   clock?: SessionClock
   loadImage?: ImageLoader
@@ -108,7 +109,7 @@ export function useGameSession(options: UseGameSessionOptions): GameSessionContr
     }
     const grid = getGridSize(stage, getArtworkOrientation(choice.artwork.width, choice.artwork.height))
     const session: GameSession = {
-      stage, usedArtworkIds: choice.usedArtworkIds, artwork: choice.artwork,
+      stage, usedArtworkIds: choice.usedArtworkIds, artwork: choice.artwork as CatalogArtwork,
       board: createShuffledBoard(grid.rows, grid.columns, random), selectedTileIndex: null,
       startedAtMs: null, finishedAtMs: null,
     }
