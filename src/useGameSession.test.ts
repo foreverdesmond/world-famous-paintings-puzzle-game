@@ -56,7 +56,10 @@ function solvePractice(result: { current: ReturnType<typeof useGameSession> }) {
   }
 }
 
-afterEach(() => vi.restoreAllMocks())
+afterEach(() => {
+  vi.restoreAllMocks()
+  vi.unstubAllGlobals()
+})
 
 describe('useGameSession', () => {
   it('keeps preview non-interactive and starts timing only on the first tile click', async () => {
@@ -76,6 +79,38 @@ describe('useGameSession', () => {
     act(() => clock.advanceBy(1234))
     expect(result.current.session?.startedAtMs).toBe(5000)
     expect(result.current.elapsedMs).toBe(1234)
+  })
+
+  it('atomically accepts only one same-batch startGame call', async () => {
+    const clock = new FakeClock()
+    const loadImage = vi.fn(async () => undefined)
+    const { result } = renderHook(() => useGameSession({ artworks, clock, random: () => 0, loadImage }))
+
+    act(() => {
+      result.current.startGame()
+      result.current.startGame()
+    })
+    expect(result.current.status).toBe('loading')
+    await act(flushPromises)
+    expect(result.current.status).toBe('preview')
+    expect(result.current.session?.stage).toBe(1)
+    expect(loadImage).toHaveBeenCalledTimes(1)
+  })
+
+  it('counts elapsed time when the first valid click occurs at clock time zero', async () => {
+    const clock = new FakeClock()
+    const { result } = renderHook(() => useGameSession({
+      artworks, clock, random: () => 0, previewDurationMs: 0, loadImage: async () => undefined,
+    }))
+
+    act(() => result.current.startGame())
+    await act(flushPromises)
+    act(() => clock.advanceBy(0))
+    expect(result.current.status).toBe('playing')
+    act(() => result.current.clickTile(0))
+    expect(result.current.session?.startedAtMs).toBe(0)
+    act(() => clock.advanceBy(1000))
+    expect(result.current.elapsedMs).toBe(1000)
   })
 
   it('allows startGame only from idle and rejects it in playing, fault, and completed', async () => {
@@ -191,11 +226,12 @@ describe('useGameSession', () => {
     const clock = new FakeClock()
     const setItem = vi.spyOn(Storage.prototype, 'setItem')
     const cookieSetter = vi.spyOn(Document.prototype, 'cookie', 'set')
-    const indexedDbOpen = typeof window.indexedDB === 'undefined' ? undefined : vi.spyOn(window.indexedDB, 'open')
+    const indexedDbOpen = vi.fn()
+    vi.stubGlobal('indexedDB', { open: indexedDbOpen })
     const { result } = renderHook(() => useGameSession({ artworks, clock, loadImage: async () => undefined }))
     act(() => result.current.startGame()); await act(flushPromises)
     expect(setItem).not.toHaveBeenCalled()
     expect(cookieSetter).not.toHaveBeenCalled()
-    if (indexedDbOpen) expect(indexedDbOpen).not.toHaveBeenCalled()
+    expect(indexedDbOpen).not.toHaveBeenCalled()
   })
 })

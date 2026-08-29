@@ -85,6 +85,7 @@ export function useGameSession(options: UseGameSessionOptions): GameSessionContr
     status: 'idle', session: null, elapsedMs: 0, loadAttempt: 0,
   })
   const generation = useRef(0)
+  const startClaimed = useRef(false)
   const timers = useRef<unknown[]>([])
 
   const clearTimers = useCallback(() => {
@@ -137,7 +138,8 @@ export function useGameSession(options: UseGameSessionOptions): GameSessionContr
   }, [clock, loadImage, maxLoadAttempts, options.artworks, previewDurationMs, random, retryDelayMs])
 
   const startGame = useCallback(() => {
-    if (state.status !== 'idle') return
+    if (startClaimed.current || state.status !== 'idle') return
+    startClaimed.current = true
     invalidate()
     const token = generation.current
     beginStage(1, new Set(), token)
@@ -164,6 +166,7 @@ export function useGameSession(options: UseGameSessionOptions): GameSessionContr
   }, [beginStage, invalidate, state])
 
   const exitGame = useCallback(() => {
+    startClaimed.current = false
     invalidate()
     setState({ status: 'idle', session: null, elapsedMs: 0, loadAttempt: 0 })
   }, [invalidate])
@@ -171,9 +174,9 @@ export function useGameSession(options: UseGameSessionOptions): GameSessionContr
   useEffect(() => () => invalidate(), [invalidate])
 
   useEffect(() => {
-    if (state.status !== 'playing' || !state.session?.startedAtMs) return
+    if (state.status !== 'playing' || state.session?.startedAtMs === null || state.session?.startedAtMs === undefined) return
     const interval = clock.setInterval(() => setState((current) => {
-      if (!current.session?.startedAtMs || current.status !== 'playing') return current
+      if (current.session?.startedAtMs === null || current.session?.startedAtMs === undefined || current.status !== 'playing') return current
       return { ...current, elapsedMs: clock.now() - current.session.startedAtMs }
     }), 250)
     return () => clock.clearInterval(interval)
