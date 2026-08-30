@@ -21,7 +21,7 @@ export function App() {
     <header className="game-header"><div><p className="eyebrow">WORLD FAMOUS PAINTINGS</p><h1>世界名画拼图小游戏</h1></div><button className="text-button" type="button" onClick={game.exitGame}>退出游戏</button></header>
     <div className="mobile-gate" role="status"><span className="gate-icon">↻</span><strong>请横向旋转设备后继续游戏</strong><span>需要至少 640px 宽度以显示棋盘</span></div>
     <div className="game-layout"><section className="board-panel" aria-label="拼图区域">
-      <PuzzleFrame>
+      <PuzzleFrame orientation={getArtworkOrientation(session.artwork.width, session.artwork.height) === 'portrait' ? 'portrait' : 'landscape'}>
         {isPreview ? <>
           <div className="preview-note">原图预览 · 5 秒</div>
           <PreviewArtwork artwork={session.artwork} />

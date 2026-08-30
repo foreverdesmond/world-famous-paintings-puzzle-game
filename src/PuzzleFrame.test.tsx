@@ -22,13 +22,27 @@ describe('PuzzleFrame responsive container', () => {
   it('caps the frame by viewport height and prevents artwork-size overflow at responsive breakpoints', () => {
     render(<PuzzleFrame><span>content</span></PuzzleFrame>)
     const frame = screen.getByTestId('puzzle-frame')
-    expect(css).toMatch(/\.puzzle-frame\s*\{[^}]*width:\s*100%[^}]*height:\s*var\(--frame-height,\s*min\(70svh,\s*42rem\)\)[^}]*min-height:[^}]*overflow:\s*hidden/)
-    expect(css).toMatch(/\.puzzle-board\s*\{[^}]*width:\s*min\(100%,\s*62rem\)[^}]*max-height:\s*100%[^}]*overflow:\s*hidden/)
+    expect(css).toMatch(/\.puzzle-frame\s*\{[^}]*width:\s*min\(100%,\s*calc\(min\(70svh,\s*42rem\)\s*\*\s*4\s*\/\s*3\)\)[^}]*aspect-ratio:\s*var\(--frame-ratio,\s*4\s*\/\s*3\)[^}]*max-height:[^}]*overflow:\s*hidden/)
+    expect(css).toMatch(/\.puzzle-frame--landscape\s*\{[^}]*--frame-ratio:\s*4\s*\/\s*3/)
+    expect(css).toMatch(/\.puzzle-frame--portrait\s*\{[^}]*--frame-ratio:\s*3\s*\/\s*4/)
+    expect(css).toMatch(/\.puzzle-board\s*\{[^}]*width:\s*min\(100%,\s*62rem\)[^}]*max-width:\s*100%[^}]*max-height:\s*100%[^}]*overflow:\s*hidden/)
     expect(frame).toHaveStyle(`--frame-height: ${puzzleFrameLayout.defaultHeight}`)
     expect(frame).toHaveStyle(`--frame-min-height: ${puzzleFrameLayout.defaultMinHeight}`)
     expect(frame).toHaveAttribute('data-height-limit', puzzleFrameLayout.defaultHeight)
     expect(frame).toHaveAttribute('data-landscape-height', puzzleFrameLayout.landscapeHeight)
-    expect(css).toContain('.puzzle-frame { height: var(--landscape-frame-height, calc(100svh - 11rem)); min-height: 12rem; }')
+    expect(css).toContain('.puzzle-frame { max-height: var(--landscape-frame-height, calc(100svh - 11rem)); min-height: min(12rem, var(--landscape-frame-height, calc(100svh - 11rem))); width: min(100%, calc((100svh - 11rem) * 4 / 3)); }')
+  })
+
+  it.each([
+    { orientation: 'landscape' as const, width: 1600, height: 900, ratio: '4 / 3' },
+    { orientation: 'portrait' as const, width: 700, height: 1400, ratio: '3 / 4' },
+  ])('$orientation artwork uses the matching fixed frame', ({ orientation, width, height, ratio }) => {
+    render(<PuzzleFrame orientation={orientation}><PuzzleBoard board={board} artwork={artwork(width, height)} selectedTileIndex={null} onTileClick={() => undefined} /></PuzzleFrame>)
+    const frame = screen.getByTestId('puzzle-frame')
+    expect(frame).toHaveClass(`puzzle-frame--${orientation}`)
+    expect(frame).toHaveAttribute('data-frame-orientation', orientation)
+    expect(frame).toHaveAttribute('data-frame-ratio', ratio)
+    expect(frame).toHaveStyle(`--frame-ratio: ${ratio}`)
   })
 
   it.each([
@@ -42,12 +56,14 @@ describe('PuzzleFrame responsive container', () => {
     const puzzle = screen.getByTestId('puzzle-board')
     expect(puzzle).toHaveStyle(`aspect-ratio: ${ratio}`)
     expect(frame).toContainElement(puzzle)
-    expect(css).toMatch(/\.preview-image\s*\{[^}]*max-width:\s*100%[^}]*max-height:\s*100%[^}]*object-fit:\s*contain/)
+    expect(css).toMatch(/\.preview-image\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*max-width:\s*100%[^}]*max-height:\s*100%[^}]*object-fit:\s*contain/)
   })
 
   it('uses the same bounded frame for a complete preview image', () => {
-    render(<PuzzleFrame><PreviewArtwork artwork={artwork(2400, 1200)} /></PuzzleFrame>)
+    render(<PuzzleFrame orientation="portrait"><PreviewArtwork artwork={artwork(700, 1400)} /></PuzzleFrame>)
     expect(screen.getByTestId('puzzle-frame')).toContainElement(screen.getByTestId('preview-image'))
+    expect(screen.getByTestId('puzzle-frame')).toHaveClass('puzzle-frame--portrait')
+    expect(screen.getByTestId('preview-image')).toHaveStyle('object-fit: contain')
     expect(screen.queryAllByRole('button')).toHaveLength(0)
   })
 })
