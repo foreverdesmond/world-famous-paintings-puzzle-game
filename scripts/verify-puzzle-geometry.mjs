@@ -14,6 +14,11 @@ try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
   await page.goto(baseUrl, { waitUntil: 'load' })
   await page.getByRole('button', { name: '开始游戏' }).click()
+  await page.locator('[data-testid="preview-image"]').waitFor({ state: 'visible' })
+
+  const portraitPreview = await readPreviewGeometry(page)
+  assertPreviewGeometry(portraitPreview, 1920 / 2861, 'portrait preview')
+
   await page.waitForTimeout(5200)
 
   const board = page.locator('[data-testid="puzzle-board"]')
@@ -41,10 +46,48 @@ try {
   assert(geometry.document.scrollWidth <= geometry.document.clientWidth, 'document has horizontal scroll overflow')
   assertClose(geometry.result.width, geometry.frame.width, 0.5, 'result width does not match frame width')
   assertClose(geometry.result.x + geometry.result.width / 2, geometry.frame.x + geometry.frame.width / 2, 0.5, 'result center does not match frame center')
-  console.log(JSON.stringify({ geometry, boardRatio, expectedRatio, assertions: 7 }, null, 2))
+
+  await page.getByRole('button', { name: '下一关' }).click()
+  await page.locator('[data-testid="preview-image"]').waitFor({ state: 'visible' })
+  const landscapePreview = await readPreviewGeometry(page)
+  assertPreviewGeometry(landscapePreview, 1879 / 1500, 'landscape preview')
+
+  console.log(JSON.stringify({ portraitPreview, landscapePreview, geometry, boardRatio, expectedRatio, assertions: 31 }, null, 2))
   await browser.close()
 } finally {
   server.kill('SIGTERM')
+}
+
+async function readPreviewGeometry(page) {
+  return page.evaluate(() => {
+    const frame = document.querySelector('[data-testid="puzzle-frame"]')
+    const image = document.querySelector('[data-testid="preview-image"]')
+    const measure = (element) => {
+      const rect = element.getBoundingClientRect()
+      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height, right: rect.right, bottom: rect.bottom, clientWidth: element.clientWidth, clientHeight: element.clientHeight, scrollWidth: element.scrollWidth, scrollHeight: element.scrollHeight }
+    }
+    return {
+      orientation: frame.dataset.frameOrientation,
+      frame: measure(frame),
+      image: { ...measure(image), naturalWidth: image.naturalWidth, naturalHeight: image.naturalHeight },
+      document: { clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth, clientHeight: document.documentElement.clientHeight, scrollHeight: document.documentElement.scrollHeight },
+    }
+  })
+}
+
+function assertPreviewGeometry(preview, expectedRatio, label) {
+  assert(preview.orientation === (label.startsWith('portrait') ? 'portrait' : 'landscape'), `${label} orientation mismatch`)
+  assert(preview.frame.scrollWidth <= preview.frame.clientWidth, `${label} frame has horizontal scroll overflow`)
+  assert(preview.frame.scrollHeight <= preview.frame.clientHeight, `${label} frame has vertical scroll overflow`)
+  assert(preview.image.scrollWidth <= preview.image.clientWidth, `${label} image has horizontal scroll overflow`)
+  assert(preview.image.scrollHeight <= preview.image.clientHeight, `${label} image has vertical scroll overflow`)
+  assert(preview.document.scrollWidth <= preview.document.clientWidth, `${label} document has horizontal scroll overflow`)
+  assert(preview.document.scrollHeight <= preview.document.clientHeight, `${label} document has vertical scroll overflow`)
+  assert(preview.image.x >= preview.frame.x, `${label} image extends past frame left edge`)
+  assert(preview.image.right <= preview.frame.right, `${label} image extends past frame right edge`)
+  assert(preview.image.y >= preview.frame.y, `${label} image extends past frame top edge`)
+  assert(preview.image.bottom <= preview.frame.bottom, `${label} image extends past frame bottom edge`)
+  assertClose(preview.image.width / preview.image.height, expectedRatio, 0.002, `${label} ratio ${preview.image.width / preview.image.height} != ${expectedRatio}`)
 }
 
 async function waitForServer(url) {

@@ -57,7 +57,7 @@ describe('PuzzleFrame responsive container', () => {
     const puzzle = screen.getByTestId('puzzle-board')
     expect(puzzle).toHaveStyle(`aspect-ratio: ${ratio}`)
     expect(frame).toContainElement(puzzle)
-    expect(css).toMatch(/\.preview-image\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*max-width:\s*100%[^}]*max-height:\s*100%[^}]*object-fit:\s*contain/)
+    expect(css).toMatch(/\.preview-image\s*\{[^}]*width:\s*auto[^}]*height:\s*auto[^}]*min-width:\s*0[^}]*min-height:\s*0[^}]*max-width:\s*100%[^}]*max-height:\s*100%[^}]*object-fit:\s*contain/)
   })
 
   it('uses the same bounded frame for a complete preview image', () => {
