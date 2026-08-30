@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Board } from './gameRules'
-import { PuzzleBoard } from './PuzzleBoard'
+import { getContainedBoardGeometry, PuzzleBoard } from './PuzzleBoard'
 
 const board: Board = { rows: 2, columns: 2, tiles: [0, 1, 2, 3].map((id) => ({ id, correctIndex: id })) }
 const artwork = { id: 'demo', title: 'Demo', titleZh: '示例', artist: 'Artist', artistZh: '作者', date: '1900', imagePath: '/demo.jpg', width: 1200, height: 800 }
@@ -35,5 +35,24 @@ describe('PuzzleBoard', () => {
   it('marks the board during the one-shot completion celebration', () => {
     render(<PuzzleBoard board={board} artwork={artwork} selectedTileIndex={null} celebrating onTileClick={() => undefined} />)
     expect(screen.getByTestId('puzzle-board')).toHaveClass('is-celebrating')
+  })
+
+  it('computes a contained Mona Lisa board with its real ratio and no overflow', () => {
+    const monaLisa = { ...artwork, width: 1920, height: 2861 }
+    const geometry = getContainedBoardGeometry(monaLisa.width, monaLisa.height, 'portrait')
+    render(<PuzzleBoard board={board} artwork={monaLisa} frameOrientation="portrait" selectedTileIndex={null} onTileClick={() => undefined} />)
+    const puzzle = screen.getByTestId('puzzle-board')
+    const frameWidth = 300
+    const frameHeight = 400
+    const renderedWidth = frameWidth * geometry.widthPercent / 100
+    const renderedHeight = frameHeight * geometry.heightPercent / 100
+    expect(Number(puzzle.dataset.boardWidthPercent)).toBeCloseTo(geometry.widthPercent, 8)
+    expect(Number(puzzle.dataset.boardHeightPercent)).toBeCloseTo(geometry.heightPercent, 8)
+    expect(renderedWidth / renderedHeight).toBeCloseTo(monaLisa.width / monaLisa.height, 8)
+    expect(renderedWidth).toBeLessThanOrEqual(frameWidth)
+    expect(renderedHeight).toBeLessThanOrEqual(frameHeight)
+    expect(geometry.renderedAspectRatio).toBeCloseTo(monaLisa.width / monaLisa.height, 8)
+    expect(puzzle).toHaveStyle(`width: ${geometry.widthPercent}%`)
+    expect(puzzle).toHaveStyle(`height: ${geometry.heightPercent}%`)
   })
 })

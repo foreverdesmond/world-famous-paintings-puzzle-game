@@ -22,15 +22,16 @@ describe('PuzzleFrame responsive container', () => {
   it('caps the frame by viewport height and prevents artwork-size overflow at responsive breakpoints', () => {
     render(<PuzzleFrame><span>content</span></PuzzleFrame>)
     const frame = screen.getByTestId('puzzle-frame')
-    expect(css).toMatch(/\.puzzle-frame\s*\{[^}]*width:\s*min\(100%,\s*calc\(min\(70svh,\s*42rem\)\s*\*\s*4\s*\/\s*3\)\)[^}]*aspect-ratio:\s*var\(--frame-ratio,\s*4\s*\/\s*3\)[^}]*max-height:[^}]*overflow:\s*hidden/)
+    expect(css).toMatch(/\.puzzle-column\s*\{[^}]*width:\s*min\(100%,\s*calc\(min\(70svh,\s*42rem\)\s*\*\s*4\s*\/\s*3\)\)/)
+    expect(css).toMatch(/\.puzzle-frame\s*\{[^}]*width:\s*100%[^}]*aspect-ratio:\s*var\(--frame-ratio,\s*4\s*\/\s*3\)[^}]*max-height:[^}]*overflow:\s*hidden/)
     expect(css).toMatch(/\.puzzle-frame--landscape\s*\{[^}]*--frame-ratio:\s*4\s*\/\s*3/)
     expect(css).toMatch(/\.puzzle-frame--portrait\s*\{[^}]*--frame-ratio:\s*3\s*\/\s*4/)
-    expect(css).toMatch(/\.puzzle-board\s*\{[^}]*width:\s*min\(100%,\s*62rem\)[^}]*max-width:\s*100%[^}]*max-height:\s*100%[^}]*overflow:\s*hidden/)
+    expect(css).toMatch(/\.puzzle-board\s*\{[^}]*width:\s*var\(--board-width,\s*auto\)[^}]*height:\s*var\(--board-height,\s*auto\)[^}]*max-width:\s*100%[^}]*max-height:\s*100%[^}]*overflow:\s*hidden/)
     expect(frame).toHaveStyle(`--frame-height: ${puzzleFrameLayout.defaultHeight}`)
     expect(frame).toHaveStyle(`--frame-min-height: ${puzzleFrameLayout.defaultMinHeight}`)
     expect(frame).toHaveAttribute('data-height-limit', puzzleFrameLayout.defaultHeight)
     expect(frame).toHaveAttribute('data-landscape-height', puzzleFrameLayout.landscapeHeight)
-    expect(css).toContain('.puzzle-frame { max-height: var(--landscape-frame-height, calc(100svh - 11rem)); min-height: min(12rem, var(--landscape-frame-height, calc(100svh - 11rem))); width: min(100%, calc((100svh - 11rem) * 4 / 3)); }')
+    expect(css).toContain('.puzzle-column { width: min(100%, calc((100svh - 11rem) * 4 / 3)); }')
   })
 
   it.each([
@@ -65,5 +66,14 @@ describe('PuzzleFrame responsive container', () => {
     expect(screen.getByTestId('puzzle-frame')).toHaveClass('puzzle-frame--portrait')
     expect(screen.getByTestId('preview-image')).toHaveStyle('object-fit: contain')
     expect(screen.queryAllByRole('button')).toHaveLength(0)
+  })
+
+  it('keeps the result region in the same centered column as the frame', () => {
+    render(<div className="puzzle-column puzzle-column--portrait"><PuzzleFrame orientation="portrait"><span>board</span></PuzzleFrame><section className="result-panel" aria-label="result">result</section></div>)
+    const frame = screen.getByTestId('puzzle-frame')
+    const result = screen.getByRole('region', { name: 'result' })
+    expect(frame.parentElement).toBe(result.parentElement)
+    expect(result).toHaveClass('result-panel')
+    expect(css).toMatch(/\.result-panel\s*\{[^}]*width:\s*100%/)
   })
 })
