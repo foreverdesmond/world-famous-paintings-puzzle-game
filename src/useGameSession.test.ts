@@ -153,6 +153,8 @@ describe('useGameSession', () => {
     const completed = renderHook(() => useGameSession({ artworks, clock, random: () => 0, loadImage: async () => undefined }))
     act(() => completed.result.current.startGame()); await act(flushPromises); act(() => clock.advanceBy(5000))
     solvePractice(completed.result)
+    expect(completed.result.current.status).toBe('celebrating')
+    act(() => clock.advanceBy(700))
     expect(completed.result.current.status).toBe('completed')
     const completedSession = completed.result.current.session
     act(() => completed.result.current.startGame())
@@ -167,6 +169,7 @@ describe('useGameSession', () => {
     const { result } = renderHook(() => useGameSession({ artworks, clock, random: () => 0, loadImage: async () => undefined }))
     act(() => result.current.startGame()); await act(flushPromises); act(() => clock.advanceBy(5000))
     solvePractice(result)
+    act(() => clock.advanceBy(700))
     expect(result.current.status).toBe('completed')
     expect(result.current.session?.stage).toBe(1)
     act(() => result.current.nextStage()); await act(flushPromises)
@@ -210,10 +213,10 @@ describe('useGameSession', () => {
     act(() => result.current.startGame()); await act(flushPromises)
     // Move the in-memory session to the final state through the public flow.
     for (let stage = 1; stage <= 99; stage += 1) {
-      act(() => clock.advanceBy(5000)); solvePractice(result)
+      act(() => clock.advanceBy(5000)); solvePractice(result); act(() => clock.advanceBy(700))
       act(() => result.current.nextStage()); await act(flushPromises)
     }
-    act(() => clock.advanceBy(5000)); solvePractice(result)
+    act(() => clock.advanceBy(5000)); solvePractice(result); act(() => clock.advanceBy(700))
     expect(result.current.session?.stage).toBe(100)
     expect(result.current.status).toBe('final-completed')
     const finalSession = result.current.session

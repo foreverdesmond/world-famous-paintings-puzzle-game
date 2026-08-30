@@ -10,7 +10,7 @@ import {
   selectTile,
 } from './gameRules'
 
-export type SessionStatus = 'idle' | 'loading' | 'preview' | 'playing' | 'completed' | 'final-completed' | 'fault'
+export type SessionStatus = 'idle' | 'loading' | 'preview' | 'playing' | 'celebrating' | 'completed' | 'final-completed' | 'fault'
 
 export interface GameSession {
   stage: number
@@ -38,6 +38,7 @@ export interface UseGameSessionOptions {
   clock?: SessionClock
   loadImage?: ImageLoader
   previewDurationMs?: number
+  completionAnimationDurationMs?: number
   maxLoadAttempts?: number
   retryDelayMs?: (failedAttempt: number) => number
 }
@@ -55,6 +56,7 @@ export interface GameSessionController {
 
 const DEFAULT_MAX_LOAD_ATTEMPTS = 5
 const DEFAULT_RETRY_DELAY_MS = (failedAttempt: number) => failedAttempt * 100
+const DEFAULT_COMPLETION_ANIMATION_DURATION_MS = 700
 
 export function createBrowserClock(): SessionClock {
   return {
@@ -80,6 +82,7 @@ export function useGameSession(options: UseGameSessionOptions): GameSessionContr
   const random = options.random ?? Math.random
   const loadImage = options.loadImage ?? loadImageInBrowser
   const previewDurationMs = options.previewDurationMs ?? 5000
+  const completionAnimationDurationMs = options.completionAnimationDurationMs ?? DEFAULT_COMPLETION_ANIMATION_DURATION_MS
   const maxLoadAttempts = options.maxLoadAttempts ?? DEFAULT_MAX_LOAD_ATTEMPTS
   const retryDelayMs = options.retryDelayMs ?? DEFAULT_RETRY_DELAY_MS
   const [state, setState] = useState<Pick<GameSessionController, 'status' | 'session' | 'elapsedMs' | 'loadAttempt'>>({
@@ -155,9 +158,15 @@ export function useGameSession(options: UseGameSessionOptions): GameSessionContr
       if (current.session.startedAtMs === null) session.startedAtMs = now
       if (!selected.completed) return { ...current, session, elapsedMs: session.startedAtMs === null ? 0 : now - session.startedAtMs }
       session.finishedAtMs = now
-      return { ...current, status: session.stage === 100 ? 'final-completed' : 'completed', session, elapsedMs: session.startedAtMs === null ? 0 : now - session.startedAtMs }
+      const completionToken = generation.current
+      const completionTimer = clock.setTimeout(() => {
+        if (generation.current !== completionToken) return
+        setState((latest) => ({ ...latest, status: session.stage === 100 ? 'final-completed' : 'completed' }))
+      }, completionAnimationDurationMs)
+      timers.current.push(completionTimer)
+      return { ...current, status: 'celebrating', session, elapsedMs: session.startedAtMs === null ? 0 : now - session.startedAtMs }
     })
-  }, [clock])
+  }, [clock, completionAnimationDurationMs])
 
   const nextStage = useCallback(() => {
     if (state.status !== 'completed' || !state.session) return

@@ -14,6 +14,7 @@ describe('ResultDialog', () => {
     expect(screen.getByText('1秒')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '下一关' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '退出游戏' })).toBeInTheDocument()
+    expect(screen.getByRole('region')).toHaveClass('result-panel')
     expect(screen.queryByRole('button', { name: /重开|重打乱/ })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: '下一关' }))
     fireEvent.click(screen.getByRole('button', { name: '退出游戏' }))

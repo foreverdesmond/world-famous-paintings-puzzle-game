@@ -7,12 +7,13 @@ interface PuzzleBoardProps {
   artwork: Artwork
   selectedTileIndex: number | null
   disabled?: boolean
+  celebrating?: boolean
   onTileClick(index: number): void
 }
 
-export function PuzzleBoard({ board, artwork, selectedTileIndex, disabled = false, onTileClick }: PuzzleBoardProps) {
+export function PuzzleBoard({ board, artwork, selectedTileIndex, celebrating = false, disabled = false, onTileClick }: PuzzleBoardProps) {
   return (
-    <div className="puzzle-board" data-testid="puzzle-board" data-grid-gap="0" style={{ '--board-columns': board.columns, '--board-rows': board.rows, aspectRatio: `${artwork.width} / ${artwork.height}` } as CSSProperties} aria-label={`${artwork.titleZh}拼图棋盘`}>
+    <div className={`puzzle-board${celebrating ? ' is-celebrating' : ''}`} data-testid="puzzle-board" data-grid-gap="0" style={{ '--board-columns': board.columns, '--board-rows': board.rows, aspectRatio: `${artwork.width} / ${artwork.height}` } as CSSProperties} aria-label={`${artwork.titleZh}拼图棋盘`}>
       {board.tiles.map((tile, index) => {
         const correctRow = Math.floor(tile.correctIndex / board.columns)
         const correctColumn = tile.correctIndex % board.columns

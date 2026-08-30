@@ -32,4 +32,8 @@ describe('PuzzleBoard', () => {
     expect(screen.getAllByRole('button')).toHaveLength(rows * columns)
     expect(screen.getByTestId('puzzle-board')).toHaveAttribute('data-grid-gap', '0')
   })
+  it('marks the board during the one-shot completion celebration', () => {
+    render(<PuzzleBoard board={board} artwork={artwork} selectedTileIndex={null} celebrating onTileClick={() => undefined} />)
+    expect(screen.getByTestId('puzzle-board')).toHaveClass('is-celebrating')
+  })
 })
