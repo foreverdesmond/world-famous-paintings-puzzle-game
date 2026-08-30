@@ -10,6 +10,8 @@ h1 { margin: 0; font-family: Georgia, serif; font-size: clamp(2rem, 5vw, 4rem); 
 .primary-button, .text-button { cursor: pointer; border: 0; }
 .primary-button { border-radius: 999px; padding: .85rem 1.6rem; color: #21170e; background: #d2a264; font-weight: 700; box-shadow: 0 8px 24px #0004; }
 .primary-button:hover, .primary-button:focus-visible { background: #f0c98e; }
+.secondary-button { cursor: pointer; border: 1px solid #a47b4d; border-radius: 999px; padding: .8rem 1.35rem; color: #f5ecdc; background: transparent; font-weight: 700; }
+.secondary-button:hover, .secondary-button:focus-visible { border-color: #f0c98e; background: #3a2a1d; }
 .game-header { display: flex; align-items: end; justify-content: space-between; gap: 1rem; max-width: 1440px; margin: 0 auto clamp(1.2rem, 3vw, 2.5rem); }
 .game-header h1 { font-size: clamp(1.65rem, 3vw, 2.6rem); }
 .text-button { padding: .5rem .1rem; color: #d2a264; background: transparent; }
@@ -36,7 +38,22 @@ h1 { margin: 0; font-family: Georgia, serif; font-size: clamp(2rem, 5vw, 4rem); 
 .artwork-card p { margin: .75rem 0 0; color: #f5ecdc; line-height: 1.45; }
 .artwork-card p b { display: block; margin-bottom: .15rem; color: #c9a778; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; }
 .mobile-gate { display: none; }
+.result-panel { grid-column: 1 / -1; position: relative; display: grid; justify-items: center; gap: .55rem; margin: 1rem auto 0; width: min(100%, 38rem); border: 1px solid #a47b4d; border-radius: 1.25rem; padding: 2rem; background: #2b1e14f2; box-shadow: 0 20px 50px #0007; text-align: center; animation: result-enter 260ms ease both; }
+.result-page { display: grid; align-content: start; }
+.result-page .result-panel { margin-top: 10vh; }
+.result-icon { display: grid; place-items: center; width: 3.2rem; height: 3.2rem; border: 1px solid #d2a264; border-radius: 50%; color: #f0c98e; font-size: 1.8rem; }
+.result-panel h2 { margin: 0; font-family: Georgia, serif; font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 500; }
+.result-copy { margin: .25rem 0 .8rem; color: #c9bca9; }
+.result-copy strong { color: #f5ecdc; font-variant-numeric: tabular-nums; }
+.result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; margin-top: .35rem; }
+.final-result { overflow: hidden; }
+.final-result::before, .final-result::after { content: ''; position: absolute; inset: 1rem; border: 1px solid #d2a26466; border-radius: 1rem; pointer-events: none; animation: celebration-pulse 1.8s ease-in-out infinite; }
+.final-result::after { inset: 2rem; animation-delay: .3s; }
+.fault-result { border-color: #a56e5a; }
+@keyframes result-enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes celebration-pulse { 0%, 100% { opacity: .25; transform: scale(.98); } 50% { opacity: .8; transform: scale(1.02); } }
 @media (max-width: 1023px) and (min-width: 640px) and (orientation: landscape) { .game-layout { grid-template-columns: minmax(0, 1fr) minmax(13rem, 30vw); align-items: center; max-width: 70rem; min-height: calc(100svh - 8rem); } .board-panel { max-height: calc(100svh - 8rem); } .puzzle-board { width: auto; height: calc(100svh - 9rem); max-width: 100%; } .game-sidebar { min-width: 0; } }
 @media (max-width: 1023px) and (min-width: 640px) and (orientation: portrait) { .game-layout { grid-template-columns: minmax(0, 1fr); max-width: 56rem; } .game-sidebar { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 639px), (pointer: coarse) and (orientation: portrait) { .game-layout { display: none; } .mobile-gate { display: grid; min-height: 55vh; place-content: center; justify-items: center; gap: .6rem; padding: 2rem; border: 1px solid #73573c; border-radius: 1.25rem; color: #c9bca9; text-align: center; } .mobile-gate strong { color: #f5ecdc; } .gate-icon { color: #d2a264; font-size: 2.5rem; } }
 @media (prefers-reduced-motion: reduce) { .puzzle-tile { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .result-panel, .final-result::before, .final-result::after { animation: none; } }
