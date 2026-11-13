@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="世界名画拼图 LOGO">
+  <defs>
+    <linearGradient id="frame" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E9C46A"/>
+      <stop offset="0.5" stop-color="#B8862B"/>
+      <stop offset="1" stop-color="#F2D488"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1D3557"/>
+      <stop offset="1" stop-color="#2A5C8A"/>
+    </linearGradient>
+    <clipPath id="canvas">
+      <path d="M12 12 H52 V27 a5 5 0 1 0 0 10 V52 H12 Z"/>
+    </clipPath>
+  </defs>
+  <!-- 画框 -->
+  <rect x="3" y="3" width="58" height="58" rx="7" fill="url(#frame)"/>
+  <rect x="8" y="8" width="48" height="48" rx="3" fill="#7A5418"/>
+  <!-- 画布：右边缘留一个拼图凹口 -->
+  <g clip-path="url(#canvas)">
+    <rect x="12" y="12" width="40" height="40" fill="url(#sky)"/>
+    <path d="M12 30 C20 24 28 34 36 28 S48 24 52 30" fill="none" stroke="#8ECAE6" stroke-width="3" stroke-linecap="round"/>
+    <path d="M12 38 C22 33 30 42 40 36 S50 34 52 37" fill="none" stroke="#5FA8D3" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="41" cy="20" r="5" fill="#F4D35E"/>
+    <circle cx="41" cy="20" r="8" fill="none" stroke="#F4D35E" stroke-opacity="0.45" stroke-width="2"/>
+    <path d="M18 52 C19 44 21 40 23 36 C25 41 26 46 27 52 Z" fill="#14213D"/>
+    <circle cx="21" cy="18" r="1.4" fill="#FFF3B0"/>
+    <circle cx="30" cy="15" r="1.1" fill="#FFF3B0"/>
+  </g>
+  <!-- 凹口里的拼图块，表示"拼回去" -->
+  <circle cx="57" cy="32" r="4" fill="#F4D35E" stroke="#7A5418" stroke-width="1.5"/>
+</svg>
