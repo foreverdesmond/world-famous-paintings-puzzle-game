@@ -15,6 +15,8 @@ h1 { margin: 0; font-family: Georgia, serif; font-size: clamp(2rem, 5vw, 4rem); 
 .game-header { display: flex; align-items: end; justify-content: space-between; gap: 1rem; max-width: 1440px; margin: 0 auto clamp(1.2rem, 3vw, 2.5rem); }
 .game-page.is-preview { max-height: 100svh; overflow: hidden; }
 .game-header h1 { font-size: clamp(1.65rem, 3vw, 2.6rem); }
+.brand-title { display: flex; align-items: center; gap: 12px; }
+.brand-logo { flex: none; display: block; width: 40px; height: 40px; }
 .text-button { padding: .5rem .1rem; color: #d2a264; background: transparent; }
 .text-button:hover, .text-button:focus-visible { color: #f5ecdc; }
 .game-layout { display: grid; grid-template-columns: minmax(0, 1fr) 19rem; align-items: start; gap: clamp(1.25rem, 4vw, 4rem); max-width: 1440px; margin: 0 auto; }
@@ -64,5 +66,6 @@ h1 { margin: 0; font-family: Georgia, serif; font-size: clamp(2rem, 5vw, 4rem); 
 @media (max-width: 1023px) and (min-width: 640px) and (orientation: landscape) { .game-layout { grid-template-columns: minmax(0, 1fr) minmax(13rem, 30vw); align-items: center; max-width: 70rem; min-height: calc(100svh - 8rem); } .board-panel { max-height: calc(100svh - 8rem); } .puzzle-column { width: min(100%, calc((100svh - 11rem) * 4 / 3)); } .puzzle-column--portrait { width: min(100%, calc((100svh - 11rem) * 3 / 4)); } .puzzle-frame { max-height: var(--landscape-frame-height, calc(100svh - 11rem)); min-height: min(12rem, var(--landscape-frame-height, calc(100svh - 11rem))); } .game-sidebar { min-width: 0; } }
 @media (max-width: 1023px) and (min-width: 640px) and (orientation: portrait) { .game-layout { grid-template-columns: minmax(0, 1fr); max-width: 56rem; } .game-sidebar { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 639px), (pointer: coarse) and (orientation: portrait) { .game-layout { display: none; } .mobile-gate { display: grid; min-height: 55vh; place-content: center; justify-items: center; gap: .6rem; padding: 2rem; border: 1px solid #73573c; border-radius: 1.25rem; color: #c9bca9; text-align: center; } .mobile-gate strong { color: #f5ecdc; } .gate-icon { color: #d2a264; font-size: 2.5rem; } }
+@media (max-width: 600px) { .brand-logo { width: 32px; height: 32px; } }
 @media (prefers-reduced-motion: reduce) { .puzzle-tile { transition: none; } .puzzle-board.is-celebrating::after { animation: none; opacity: .35; transform: translateX(0); } }
 @media (prefers-reduced-motion: reduce) { .result-panel, .final-result::before, .final-result::after { animation: none; } }
