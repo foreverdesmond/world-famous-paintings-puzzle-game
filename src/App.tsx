@@ -11,7 +11,7 @@ export function App() {
   const game = useGameSession({ artworks: artworkCatalog })
   const session = game.session
   if (game.status === 'fault') return <main className="app-shell result-page"><header className="game-header"><div><p className="eyebrow">WORLD FAMOUS PAINTINGS</p><h1>世界名画拼图小游戏</h1></div></header><ResultDialog status="fault" onExit={game.exitGame} /></main>
-  if (game.status === 'idle' || !session) return <main className="app-shell landing-page"><p className="eyebrow">WORLD FAMOUS PAINTINGS</p><h1>世界名画拼图小游戏</h1><p className="intro">观察名画，交换切片，完成你的艺术拼图。</p><button className="primary-button start-button" type="button" onClick={game.startGame}>开始游戏</button></main>
+  if (game.status === 'idle' || !session) return <main className="app-shell landing-page"><p className="eyebrow">WORLD FAMOUS PAINTINGS</p><h1 title="交换切片，拼回名画">世界名画拼图小游戏</h1><p className="intro">观察名画，交换切片，完成你的艺术拼图。</p><button className="primary-button start-button" type="button" onClick={game.startGame}>开始游戏</button></main>
 
   const grid = getGridSize(session.stage, getArtworkOrientation(session.artwork.width, session.artwork.height))
   const isPreview = game.status === 'preview'
