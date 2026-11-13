@@ -3,8 +3,13 @@ import { describe, expect, it } from 'vitest'
 import { App } from './App'
 
 describe('application shell', () => {
-  it('renders the project title', () => {
+  it('renders the logo and project title on the landing page', () => {
     render(<App />)
-    expect(screen.getByRole('heading', { name: '世界名画拼图小游戏' })).toBeInTheDocument()
+    const logo = screen.getByTestId('logo')
+    expect(logo.tagName).toBe('IMG')
+    expect(logo).toBeInTheDocument()
+    const title = screen.getByRole('heading', { name: '世界名画拼图小游戏' })
+    expect(title).toBeInTheDocument()
+    expect(title).toHaveAttribute('title', '交换切片，拼回名画')
   })
 })
