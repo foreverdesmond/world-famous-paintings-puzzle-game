@@ -10,6 +10,7 @@ describe('Logo', () => {
     render(<Logo />)
     const image = screen.getByTestId('logo')
     expect(image).toBeInTheDocument()
+    expect(image).toHaveAttribute('class', 'brand-logo')
     expect(image).toHaveAttribute('src', logoUrl)
     expect(image).toHaveAttribute('width', '40')
     expect(image).toHaveAttribute('height', '40')
@@ -20,6 +21,22 @@ describe('Logo', () => {
     const image = screen.getByTestId('logo')
     expect(image).toHaveAttribute('width', '64')
     expect(image).toHaveAttribute('height', '64')
+  })
+
+  it('keeps the default class alongside custom classes and existing image attributes', () => {
+    render(<Logo className="header-logo compact" size={64} />)
+    const image = screen.getByTestId('logo')
+    expect(image).toHaveClass('brand-logo', 'header-logo', 'compact')
+    expect(image).toHaveAttribute('src', logoUrl)
+    expect(image).toHaveAttribute('width', '64')
+    expect(image).toHaveAttribute('height', '64')
+    expect(image).toHaveAttribute('alt', '')
+    expect(image).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('keeps the default class when the custom class is empty', () => {
+    render(<Logo className="" />)
+    expect(screen.getByTestId('logo')).toHaveAttribute('class', 'brand-logo')
   })
 
   it('is decorative: empty alt and hidden from assistive technology', () => {
