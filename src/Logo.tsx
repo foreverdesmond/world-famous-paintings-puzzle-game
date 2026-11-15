@@ -3,8 +3,9 @@ import logoUrl from './assets/logo.svg'
 type LogoProps = {
   size?: number
   className?: string
+  loading?: 'lazy' | 'eager'
 }
 
-export function Logo({ size = 40, className }: LogoProps) {
-  return <img className={className ? `brand-logo ${className}` : 'brand-logo'} data-testid="logo" src={logoUrl} alt="" aria-hidden="true" width={size} height={size} />
+export function Logo({ size = 40, className, loading }: LogoProps) {
+  return <img className={className ? `brand-logo ${className}` : 'brand-logo'} data-testid="logo" data-flow-probe="codex-s2" src={logoUrl} alt="" aria-hidden="true" width={size} height={size} loading={loading} />
 }

@@ -14,6 +14,22 @@ describe('Logo', () => {
     expect(image).toHaveAttribute('src', logoUrl)
     expect(image).toHaveAttribute('width', '40')
     expect(image).toHaveAttribute('height', '40')
+    expect(image).not.toHaveAttribute('loading')
+    expect(image).toHaveAttribute('data-flow-probe', 'codex-s2')
+  })
+
+  it.each(['lazy', 'eager'] as const)('passes loading=%s to the decorative image', (loading) => {
+    render(<Logo loading={loading} size={64} className="header-logo" />)
+    const image = screen.getByTestId('logo')
+    expect(image).toHaveAttribute('loading', loading)
+    expect(image).toHaveAttribute('data-flow-probe', 'codex-s2')
+    expect(image).toHaveClass('brand-logo', 'header-logo')
+    expect(image).toHaveAttribute('src', logoUrl)
+    expect(image).toHaveAttribute('width', '64')
+    expect(image).toHaveAttribute('height', '64')
+    expect(image).toHaveAttribute('alt', '')
+    expect(image).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.queryByRole('img')).not.toBeInTheDocument()
   })
 
   it('uses the requested size for width and height', () => {
