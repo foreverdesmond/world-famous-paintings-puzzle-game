@@ -1,0 +1,16 @@
+{
+ "PolicyVersion": 1,
+ "AuthorizedBy": "Richy 2026-11-16：「开始实跑」。载体沿用他此前的决定：默认使用 Codex，Claude 额度紧张不用；限额时由 DeepSeek 替补。",
+ "AuthorizedAt": "2026-11-16",
+ "Note": "新流程首次整段实跑（开工清单、派工测试、L2、L3、进 main、关闭迭代）。进 main 的目标是测试分支 devflow-test-main，真 main 不动。",
+ "roles": {
+  "implement": {"primary": "开发-Codex", "fallback": ["开发-Codex-DeepSeek"]},
+  "review": {"primary": "评审-Codex", "fallback": ["评审-Codex-DeepSeek"]},
+  "integrate": {"primary": "集成-Codex", "fallback": ["集成-Codex-DeepSeek"]},
+  "validate": {"primary": "验证-Codex", "fallback": ["验证-Codex-DeepSeek"]},
+  "context": {"primary": "上下文-Codex", "fallback": []}
+ },
+ "task_overrides": {},
+ "fallback_rules": {"on": ["rate_limit", "quota_exhausted", "model_unavailable"], "wait_if_reset_within_minutes": 60, "same_task_keeps_session": true},
+ "independence": "评审 Agent 不得与本卡开发 Agent 相同"
+}
