@@ -1,0 +1,29 @@
+{
+ "plan_version": 1,
+ "iteration": "LOGO-09",
+ "iteration_code": "LG9",
+ "project": "世界名画小游戏",
+ "route": "standard",
+ "repo": "foreverdesmond/world-famous-paintings-puzzle-game",
+ "base_branch": "devflow-test",
+ "iteration_branch": "LOGO-09",
+ "integration_branch": "devflow-test",
+ "task_branch_pattern": "{iteration_branch}-{type}-{code}",
+ "policy": "carrier-policy.json",
+ "dispatch_test": true,
+ "limits": {"rounds": 3, "attempts": 3},
+ "verify": {"l1": "npm ci && npm run typecheck && npm test && npm run build"},
+ "tasks": [
+  {"stage": 1, "type": "BOOT", "key": "boot", "title": "开工建迭代分支", "one_liner": "从 devflow-test 建迭代分支 LOGO-09",
+   "files_owned": [], "deps": [], "description": "从 origin/devflow-test 建迭代分支 LOGO-09。main、devflow-test、devflow-test-main 只核对不移动。"},
+  {"stage": 2, "type": "DEV", "code": "LID001", "key": "logoid", "title": "Logo 支持可选 id", "one_liner": "Logo 组件增加可选 id 属性并透传到图片",
+   "files_owned": ["src/Logo.tsx", "src/Logo.test.tsx"], "deps": ["boot"],
+   "description": "Logo 组件增加可选 id 属性，传到 img 的 id；不传时不输出 id 属性，现有 props 和装饰图无障碍行为不变。测试覆盖：传 id、不传 id。L0：npx vitest run src/Logo.test.tsx。必须正式 handoff，check 只是自查。"},
+  {"stage": 3, "type": "L1", "key": "l1", "title": "L1 迭代验证", "one_liner": "在迭代分支干净检出上跑类型检查、测试和构建",
+   "files_owned": [], "deps": ["logoid"], "description": "在迭代分支干净检出执行 npm ci、typecheck、test、build；保留证据和 NotRun。"},
+  {"stage": 4, "type": "MERGE", "key": "merge", "title": "并入集成分支", "one_liner": "Richy 批准后把 LOGO-09 并入 devflow-test",
+   "files_owned": [], "deps": ["l1"], "description": "只在 Richy 明确批准 merge 后把 LOGO-09 并入 devflow-test。不动 main。"},
+  {"stage": 5, "type": "CLOSE", "key": "close", "title": "盘点清理", "one_liner": "进 main 后自动盘点并清理本轮残留",
+   "files_owned": [], "deps": ["merge"], "description": "进 main 之后自动盘点和清理；迭代分支保留。"}
+ ]
+}
