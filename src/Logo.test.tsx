@@ -6,6 +6,25 @@ import logoUrl from './assets/logo.svg'
 describe('Logo', () => {
   afterEach(cleanup)
 
+  it('passes title to the image while preserving decorative behavior and existing props', () => {
+    render(<Logo title="世界名画小游戏" size={64} className="header-logo" loading="lazy" />)
+    const image = screen.getByTestId('logo')
+    expect(image).toHaveAttribute('title', '世界名画小游戏')
+    expect(image).toHaveClass('brand-logo', 'header-logo')
+    expect(image).toHaveAttribute('src', logoUrl)
+    expect(image).toHaveAttribute('width', '64')
+    expect(image).toHaveAttribute('height', '64')
+    expect(image).toHaveAttribute('loading', 'lazy')
+    expect(image).toHaveAttribute('alt', '')
+    expect(image).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.queryByRole('img')).not.toBeInTheDocument()
+  })
+
+  it('omits the title attribute when no title is supplied', () => {
+    render(<Logo />)
+    expect(screen.getByTestId('logo')).not.toHaveAttribute('title')
+  })
+
   it('renders the logo image at the default 40px size', () => {
     render(<Logo />)
     const image = screen.getByTestId('logo')
